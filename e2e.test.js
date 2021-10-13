@@ -57,7 +57,26 @@ describe.each(['firefox_latest', 'chrome_latest', 'iPhone_11'])('e2e', (cap) => 
       await browser.quit()
   })
 
-  test("test " + cap, async () => { 
+  test.concurrent("test " + cap, async () => { 
+    browser = await global.getBrowser(caps[cap]);
+    await browser.get('http://google.fr')
+    expect(1).toBe(1)
+  }, 20000);
+})
+
+
+describe.each(['firefox_latest', 'chrome_latest', 'iPhone_11'])('e2e 2', (cap) => {
+  let browser;
+  afterEach(async ()=> {
+    if(browser && global.results[expect.getState().currentTestName]){
+      status = global.results[expect.getState().currentTestName]
+      await browser.executeScript('browserstack_executor: {"action": "setSessionStatus", "arguments": {"status":"'+ status +'"}}');
+    }
+    if(browser)
+      await browser.quit()
+  })
+
+  test.concurrent("test " + cap, async () => { 
     browser = await global.getBrowser(caps[cap]);
     await browser.get('http://google.fr')
     expect(1).toBe(1)
